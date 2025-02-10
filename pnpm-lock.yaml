@@ -27,6 +27,9 @@ importers:
         specifier: latest
         version: 4.5.0(vue@3.5.13(typescript@5.7.3))
     devDependencies:
+      '@iconify-json/lucide':
+        specifier: ^1.2.26
+        version: 1.2.26
       wrangler:
         specifier: ^3.107.3
         version: 3.107.3(@cloudflare/workers-types@4.20250204.0)
@@ -544,6 +547,9 @@ packages:
 
   '@floating-ui/vue@1.1.6':
     resolution: {integrity: sha512-XFlUzGHGv12zbgHNk5FN2mUB7ROul3oG2ENdTpWdE+qMFxyNxWSRmsoyhiEnpmabNm6WnUvR1OvJfUfN4ojC1A==}
+
+  '@iconify-json/lucide@1.2.26':
+    resolution: {integrity: sha512-arD/8mK0lRxFY2LgLf345NhWVWiOtV8sOxJuLnq4QRz3frMiOwVwGxEgp5Xe/bRGzxO2CxxCBok0bPRpCkYZQQ==}
 
   '@iconify/collections@1.0.516':
     resolution: {integrity: sha512-Zm2XhHE++VLFYli0sjgcBDaRE6e4iBqGMNlG2RS7GQ0RF9vl6kK+MenUwGTlfaaV3wajWZ2fMO6qlfB09vR4yg==}
@@ -4224,6 +4230,10 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@iconify-json/lucide@1.2.26':
+    dependencies:
+      '@iconify/types': 2.0.0
 
   '@iconify/collections@1.0.516':
     dependencies:

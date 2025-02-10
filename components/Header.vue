@@ -32,7 +32,7 @@ const items = computed(() => [
 <template>
   <UHeader>
     <template #title>
-      <Logo class="h-6 w-auto" />
+      <h1 class="text-2xl font-bold text-white">PrimeFit</h1>
     </template>
 
     <UNavigationMenu :items="items" />
