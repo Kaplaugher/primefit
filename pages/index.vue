@@ -8,29 +8,29 @@ const links = ref([
   {
     label: 'Learn more',
     to: '/getting-started/theme',
-    color: 'neutral',
+    color: 'primary',
     variant: 'subtle',
     trailingIcon: 'i-lucide-arrow-right'
   }
 ])
 const features = ref([
   {
-    title: 'Icons',
-    description: 'Nuxt UI integrates with Nuxt Icon to access over 200,000+ icons from Iconify.',
-    icon: 'i-lucide-smile',
-    to: '/getting-started/icons'
+    title: 'Application Tracking',
+    description: 'Keep track of all your job applications in one place with our intuitive dashboard.',
+    icon: 'i-lucide-clipboard-list',
+    to: '/features/tracking'
   },
   {
-    title: 'Fonts',
-    description: 'Nuxt UI integrates with Nuxt Fonts to provide plug-and-play font optimization.',
-    icon: 'i-lucide-type',
-    to: '/getting-started/fonts'
+    title: 'AI Resume Optimization',
+    description: 'Let our AI analyze and optimize your resume for each job application.',
+    icon: 'i-lucide-sparkles',
+    to: '/features/ai-resume'
   },
   {
-    title: 'Color Mode',
-    description: 'Nuxt UI integrates with Nuxt Color Mode to switch between light and dark.',
-    icon: 'i-lucide-moon',
-    to: '/getting-started/color-mode'
+    title: 'Job Analytics',
+    description: 'Get insights into your application process and improve your success rate.',
+    icon: 'i-lucide-bar-chart',
+    to: '/features/analytics'
   }
 ])
 const plans = ref([
@@ -65,14 +65,14 @@ const plans = ref([
 
 <template>
   <UPage>
-    <UPageHero title="Ultimate Vue UI library"
-      description="A Nuxt/Vue-integrated UI library providing a rich set of fully-styled, accessible and highly customizable components for building modern web applications."
-      headline="New release" orientation="horizontal" :links="links">
-      <img src="https://ui.nuxt.com/templates/dashboard1.png" alt="App screenshot"
+    <UPageHero title="Smart Job Application Tracking"
+      description="Track your job applications, optimize your resume with AI, and increase your chances of landing your dream job with PrimeFit's comprehensive application management system."
+      headline="Launch Your Career" orientation="horizontal" :links="links">
+      <img src="https://ui.nuxt.com/templates/dashboard1.png" alt="PrimeFit dashboard screenshot"
         class="rounded-lg shadow-2xl ring ring-(--ui-border)" />
     </UPageHero>
-    <UPageSection title="Beautiful Vue UI components"
-      description="Nuxt UI provides a comprehensive suite of components and utilities to help you build beautiful and accessible web applications with Vue and Nuxt."
+    <UPageSection title="Streamline Your Job Search"
+      description="PrimeFit provides powerful tools to organize your job search, optimize your applications, and track your progress towards your next career move."
       :features="features" />
     <UPricingPlans :plans="plans" />
   </UPage>
