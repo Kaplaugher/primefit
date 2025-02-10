@@ -2,5 +2,6 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxthub/core']
-})
+  modules: ['@nuxthub/core', '@nuxt/ui-pro'],
+  css: ['~/assets/css/main.css'],
+});
