@@ -6,6 +6,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: 'i-heroicons-home', current: true },
   { name: 'Applications', href: '/dashboard/applications', icon: 'i-heroicons-users', current: false },
   { name: 'Resume', href: '/dashboard/resume', icon: 'i-heroicons-document-duplicate', current: false },
+  { name: 'Home', href: '/', icon: 'i-heroicons-home', current: false },
 ]
 
 
@@ -37,13 +38,7 @@ const sidebarOpen = ref(false)
               </ul>
             </li>
             <li class="-mx-6 mt-auto">
-              <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm/6 font-semibold hover:bg-neutral-50">
-                <img class="size-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt="" />
-                <span class="sr-only">Your profile</span>
-                <span aria-hidden="true">Tom Cook</span>
-              </a>
+              <UserButton />
             </li>
           </ul>
         </nav>
@@ -56,12 +51,7 @@ const sidebarOpen = ref(false)
         <Icon name="i-heroicons-bars-3" class="size-6" aria-hidden="true" />
       </button>
       <div class="flex-1 text-sm/6 font-semibold">Dashboard</div>
-      <a href="#">
-        <span class="sr-only">Your profile</span>
-        <img class="size-8 rounded-full"
-          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-          alt="" />
-      </a>
+      <UserButton />
     </div>
 
     <main class="py-10 lg:pl-72">

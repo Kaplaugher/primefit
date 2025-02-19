@@ -26,6 +26,14 @@ const items = computed(() => [
         <UButton color="neutral" variant="ghost" to="https://github.com/nuxt/ui" target="_blank"
           icon="i-simple-icons-github" aria-label="GitHub" />
       </UTooltip>
+
+      <SignedOut>
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+
     </template>
   </UHeader>
 </template>
