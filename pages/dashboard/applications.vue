@@ -1,78 +1,128 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   layout: 'dashboard'
 })
 
-const applications = [
+const UBadge = resolveComponent('UBadge')
+
+type Payment = {
+  id: string
+  date: string
+  status: 'paid' | 'failed' | 'refunded'
+  email: string
+  amount: number
+}
+
+const data = ref<Payment[]>([
   {
-    company: 'Acme Inc',
-    position: 'Senior Developer',
-    status: 'In Review',
-    date: '2024-03-15',
+    id: '4600',
+    date: '2024-03-11T15:30:00',
+    status: 'paid',
+    email: 'james.anderson@example.com',
+    amount: 594
   },
   {
-    company: 'TechCorp',
-    position: 'Full Stack Engineer',
-    status: 'Interview Scheduled',
-    date: '2024-03-14',
+    id: '4599',
+    date: '2024-03-11T10:10:00',
+    status: 'failed',
+    email: 'mia.white@example.com',
+    amount: 276
   },
-  // Add more sample applications as needed
+  {
+    id: '4598',
+    date: '2024-03-11T08:50:00',
+    status: 'refunded',
+    email: 'william.brown@example.com',
+    amount: 315
+  },
+  {
+    id: '4597',
+    date: '2024-03-10T19:45:00',
+    status: 'paid',
+    email: 'emma.davis@example.com',
+    amount: 529
+  },
+  {
+    id: '4596',
+    date: '2024-03-10T15:55:00',
+    status: 'paid',
+    email: 'ethan.harris@example.com',
+    amount: 639
+  }
+])
+
+const columns: TableColumn<Payment>[] = [
+  {
+    accessorKey: 'id',
+    header: '#',
+    cell: ({ row }) => `#${row.getValue('id')}`
+  },
+  {
+    accessorKey: 'date',
+    header: 'Date',
+    cell: ({ row }) => {
+      return new Date(row.getValue('date')).toLocaleString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+    }
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const color = {
+        paid: 'success' as const,
+        failed: 'error' as const,
+        refunded: 'neutral' as const
+      }[row.getValue('status') as string]
+
+      return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
+        row.getValue('status')
+      )
+    }
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email'
+  },
+  {
+    accessorKey: 'amount',
+    header: () => h('div', { class: 'text-right' }, 'Amount'),
+    cell: ({ row }) => {
+      const amount = Number.parseFloat(row.getValue('amount'))
+
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EUR'
+      }).format(amount)
+
+      return h('div', { class: 'text-right font-medium' }, formatted)
+    }
+  }
 ]
+
+const table = useTemplateRef('table')
+
+const columnFilters = ref([
+  {
+    id: 'email',
+    value: 'james'
+  }
+])
 </script>
 
 <template>
-  <div>
-    <div class="md:flex md:items-center md:justify-between">
-      <div class="min-w-0 flex-1">
-        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-          Applications
-        </h2>
-      </div>
-      <div class="mt-4 flex md:ml-4 md:mt-0">
-        <button type="button"
-          class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80">
-          New Application
-        </button>
-      </div>
+  <div class="flex flex-col flex-1 w-full">
+    <div class="flex px-4 py-3.5 border-b border-(--ui-border-accented)">
+      <UInput :model-value="table?.tableApi?.getColumn('email')?.getFilterValue() as string" class="max-w-sm"
+        placeholder="Filter emails..."
+        @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)" />
     </div>
 
-    <div class="mt-6">
-      <div class="overflow-hidden rounded-xl border">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Company
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Position
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Status
-              </th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <tr v-for="application in applications" :key="application.company">
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                {{ application.company }}
-              </td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                {{ application.position }}
-              </td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                {{ application.status }}
-              </td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                {{ application.date }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <UTable ref="table" v-model:column-filters="columnFilters" :data="data" :columns="columns" />
   </div>
 </template>
