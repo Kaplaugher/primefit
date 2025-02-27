@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { UDashboardGroup } from '#components';
 
 const links = [[{
   label: 'Home',
