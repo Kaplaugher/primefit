@@ -9,6 +9,8 @@ import * as z from 'zod'
 // FormSubmitEvent is auto-imported in Nuxt
 
 const UBadge = resolveComponent('UBadge')
+const UDropdownMenu = resolveComponent('UDropdownMenu')
+const UButton = resolveComponent('UButton')
 
 // Define the Application type based on our database schema
 type Application = {
@@ -26,6 +28,49 @@ type Application = {
 // Fetch applications from the API
 const { data: apiResponse, refresh } = await useFetch<{ success: boolean, data: Application[] }>('/api/applications')
 const applications = computed(() => apiResponse.value?.success ? apiResponse.value.data : [])
+
+// Add a confirmation modal for delete
+const deleteConfirmOpen = ref(false)
+const applicationToDelete = ref<Application | null>(null)
+
+// Function to delete an application
+async function deleteApplication(application: Application) {
+  try {
+    const response = await $fetch<{ success: boolean; error?: string; message?: string }>(`/api/applications/${application.id}`, {
+      method: 'DELETE'
+    })
+
+    if (response.success) {
+      toast.add({
+        title: 'Application Deleted',
+        description: 'The application has been successfully deleted.',
+        color: 'success'
+      })
+
+      // Refresh the applications list
+      refresh()
+    } else {
+      throw new Error(response.error || 'Failed to delete application')
+    }
+  } catch (error) {
+    toast.add({
+      title: 'Error',
+      description: error instanceof Error ? error.message : 'Failed to delete application',
+      color: 'error'
+    })
+    console.error(error)
+  } finally {
+    // Reset the application to delete
+    applicationToDelete.value = null
+    deleteConfirmOpen.value = false
+  }
+}
+
+// Function to confirm deletion
+function confirmDelete(application: Application) {
+  applicationToDelete.value = application
+  deleteConfirmOpen.value = true
+}
 
 const columns: TableColumn<Application>[] = [
   {
@@ -81,6 +126,60 @@ const columns: TableColumn<Application>[] = [
       }).format(amount)
 
       return h('div', { class: 'text-right font-medium' }, formatted)
+    }
+  },
+  {
+    id: 'actions',
+    header: '',
+    enableHiding: false,
+    cell: ({ row }) => {
+      const application = row.original
+
+      const items = [
+        {
+          type: 'label',
+          label: 'Actions'
+        },
+        {
+          label: 'View Details',
+          icon: 'i-lucide-eye',
+          onSelect() {
+            // View details functionality can be added here
+            console.log('View details for application:', application.id)
+          }
+        },
+        {
+          label: 'Edit',
+          icon: 'i-lucide-pencil',
+          onSelect() {
+            // Edit functionality can be added here
+            console.log('Edit application:', application.id)
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'Delete',
+          icon: 'i-lucide-trash-2',
+          color: 'error' as const,
+          onSelect() {
+            confirmDelete(application)
+          }
+        }
+      ]
+
+      return h('div', { class: 'text-right' }, h(UDropdownMenu, {
+        content: {
+          align: 'end'
+        },
+        items
+      }, () => h(UButton, {
+        icon: 'i-lucide-ellipsis-vertical',
+        color: 'neutral',
+        variant: 'ghost',
+        class: 'ml-auto'
+      })))
     }
   }
 ]
@@ -172,6 +271,7 @@ async function onSubmit(event: any) {
 
     <UTable ref="table" v-model:column-filters="columnFilters" :data="applications" :columns="columns" />
 
+    <!-- Add Application Modal -->
     <UModal v-model:open="open" title="Add New Application"
       description="Fill out the form below to add a new application to the system.">
       <template #content>
@@ -209,6 +309,31 @@ async function onSubmit(event: any) {
               </UButton>
             </div>
           </UForm>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Delete Confirmation Modal -->
+    <UModal v-model:open="deleteConfirmOpen" title="Confirm Deletion"
+      description="Are you sure you want to delete this application? This action cannot be undone.">
+      <template #content>
+        <div class="p-4">
+          <div v-if="applicationToDelete" class="mb-6">
+            <p class="mb-2"><strong>Company:</strong> {{ applicationToDelete.companyName }}</p>
+            <p class="mb-2"><strong>Email:</strong> {{ applicationToDelete.email }}</p>
+            <p><strong>Amount:</strong> {{ new Intl.NumberFormat('en-US', {
+              style: 'currency', currency: 'EUR'
+            }).format(Number(applicationToDelete.amount)) }}</p>
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <UButton color="neutral" variant="soft" @click="deleteConfirmOpen = false">
+              Cancel
+            </UButton>
+            <UButton color="error" @click="applicationToDelete && deleteApplication(applicationToDelete)">
+              Delete
+            </UButton>
+          </div>
         </div>
       </template>
     </UModal>
