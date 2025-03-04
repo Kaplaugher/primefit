@@ -9,7 +9,7 @@ import {
 
 export const applications = pgTable('applications', {
   id: serial('id').primaryKey(),
-  applicationId: varchar('application_id', { length: 10 }).notNull(),
+  companyName: varchar('company_name', { length: 255 }).notNull(),
   date: timestamp('date').notNull().defaultNow(),
   status: varchar('status', { length: 20 }).notNull().default('pending'),
   email: varchar('email', { length: 255 }).notNull(),

@@ -10,57 +10,32 @@ import * as z from 'zod'
 
 const UBadge = resolveComponent('UBadge')
 
-type Payment = {
-  id: string
+// Define the Application type based on our database schema
+type Application = {
+  id: number
+  companyName: string
   date: string
-  status: 'paid' | 'failed' | 'refunded'
+  status: string
   email: string
-  amount: number
+  amount: string
+  notes: string | null
+  createdAt: string
+  updatedAt: string
 }
 
-const data = ref<Payment[]>([
-  {
-    id: '4600',
-    date: '2024-03-11T15:30:00',
-    status: 'paid',
-    email: 'james.anderson@example.com',
-    amount: 594
-  },
-  {
-    id: '4599',
-    date: '2024-03-11T10:10:00',
-    status: 'failed',
-    email: 'mia.white@example.com',
-    amount: 276
-  },
-  {
-    id: '4598',
-    date: '2024-03-11T08:50:00',
-    status: 'refunded',
-    email: 'william.brown@example.com',
-    amount: 315
-  },
-  {
-    id: '4597',
-    date: '2024-03-10T19:45:00',
-    status: 'paid',
-    email: 'emma.davis@example.com',
-    amount: 529
-  },
-  {
-    id: '4596',
-    date: '2024-03-10T15:55:00',
-    status: 'paid',
-    email: 'ethan.harris@example.com',
-    amount: 639
-  }
-])
+// Fetch applications from the API
+const { data: apiResponse, refresh } = await useFetch<{ success: boolean, data: Application[] }>('/api/applications')
+const applications = computed(() => apiResponse.value?.success ? apiResponse.value.data : [])
 
-const columns: TableColumn<Payment>[] = [
+const columns: TableColumn<Application>[] = [
   {
     accessorKey: 'id',
     header: '#',
     cell: ({ row }) => `#${row.getValue('id')}`
+  },
+  {
+    accessorKey: 'companyName',
+    header: 'Company',
   },
   {
     accessorKey: 'date',
@@ -80,10 +55,10 @@ const columns: TableColumn<Payment>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const color = {
-        paid: 'success' as const,
-        failed: 'error' as const,
-        refunded: 'neutral' as const
-      }[row.getValue('status') as string]
+        pending: 'warning' as const,
+        approved: 'success' as const,
+        rejected: 'error' as const
+      }[row.getValue('status') as string] || 'neutral' as const
 
       return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
         row.getValue('status')
@@ -112,38 +87,32 @@ const columns: TableColumn<Payment>[] = [
 
 const table = useTemplateRef('table')
 
-const columnFilters = ref([
-  {
-    id: 'email',
-    value: 'james'
-  }
-])
+const columnFilters = ref([])
 
 // Add a ref to control the modal's open state
 const open = ref(false)
 
 // Application form schema based on the database schema
 const applicationSchema = z.object({
-  applicationId: z.string().min(1, 'Application ID is required'),
+  companyName: z.string().min(1, 'Company name is required'),
   email: z.string().email('Invalid email address'),
   status: z.enum(['pending', 'approved', 'rejected'], {
     errorMap: () => ({ message: 'Please select a valid status' })
   }).default('pending'),
-  amount: z.string().min(1, 'Amount is required')
-    .refine((val: string) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: 'Amount must be a positive number'
-    }),
+  amount: z.coerce.number()
+    .positive('Amount must be a positive number')
+    .min(0.01, 'Amount must be greater than 0'),
   notes: z.string().optional()
 })
 
 type ApplicationSchema = z.output<typeof applicationSchema>
 
 const formState = reactive<Partial<ApplicationSchema>>({
-  applicationId: undefined,
-  email: undefined,
+  companyName: '',
+  email: '',
   status: 'pending',
   amount: undefined,
-  notes: undefined
+  notes: ''
 })
 
 const statusOptions = [
@@ -155,14 +124,39 @@ const statusOptions = [
 const toast = useToast()
 
 async function onSubmit(event: any) {
-  toast.add({
-    title: 'Application Submitted',
-    description: 'The application has been successfully added.',
-    color: 'success'
-  })
-  console.log(event.data)
-  // Here you would typically save the data to the database
-  open.value = false
+  try {
+    // Call the API to create a new application
+    await $fetch('/api/applications', {
+      method: 'POST',
+      body: event.data
+    })
+
+    toast.add({
+      title: 'Application Submitted',
+      description: 'The application has been successfully added.',
+      color: 'success'
+    })
+
+    // Reset form
+    formState.companyName = ''
+    formState.email = ''
+    formState.status = 'pending'
+    formState.amount = undefined
+    formState.notes = ''
+
+    // Close modal
+    open.value = false
+
+    // Refresh the applications list
+    refresh()
+  } catch (error) {
+    toast.add({
+      title: 'Error',
+      description: 'Failed to submit application. Please try again.',
+      color: 'error'
+    })
+    console.error(error)
+  }
 }
 </script>
 
@@ -176,7 +170,7 @@ async function onSubmit(event: any) {
       <UButton label="Add Application" color="primary" @click="open = true" />
     </div>
 
-    <UTable ref="table" v-model:column-filters="columnFilters" :data="data" :columns="columns" />
+    <UTable ref="table" v-model:column-filters="columnFilters" :data="applications" :columns="columns" />
 
     <UModal v-model:open="open" title="Add New Application"
       description="Fill out the form below to add a new application to the system.">
@@ -184,9 +178,8 @@ async function onSubmit(event: any) {
         <div class="w-full max-w-2xl p-4">
           <UForm :schema="applicationSchema" :state="formState" class="space-y-6 w-full" @submit="onSubmit">
 
-            <UFormField label="Application ID" name="applicationId" help="Unique identifier for this application"
-              class="w-full">
-              <UInput v-model="formState.applicationId" placeholder="e.g., APP12345" class="w-full" />
+            <UFormField label="Company Name" name="companyName" help="Name of the company" class="w-full">
+              <UInput v-model="formState.companyName" placeholder="e.g., Acme Corp" class="w-full" />
             </UFormField>
 
             <UFormField label="Email" name="email" help="Applicant's email address" class="w-full">
@@ -198,7 +191,8 @@ async function onSubmit(event: any) {
             </UFormField>
 
             <UFormField label="Amount" name="amount" help="Amount in EUR" class="w-full">
-              <UInput v-model="formState.amount" placeholder="0.00" type="number" step="0.01" min="0" class="w-full" />
+              <UInput v-model="formState.amount" type="number" min="0.01" step="0.01" placeholder="0.00"
+                class="w-full" />
             </UFormField>
 
             <UFormField label="Notes" name="notes" help="Additional information (optional)" class="w-full">
