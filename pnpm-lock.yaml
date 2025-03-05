@@ -11,6 +11,9 @@ importers:
       '@clerk/nuxt':
         specifier: ^1.2.0
         version: 1.2.0(magicast@0.3.5)(react@19.0.0)(vue@3.5.13(typescript@5.7.3))
+      '@google/generative-ai':
+        specifier: ^0.23.0
+        version: 0.23.0
       '@nuxt/ui-pro':
         specifier: 3.0.0-alpha.13
         version: 3.0.0-alpha.13(@babel/parser@7.26.8)(axios@1.8.1)(change-case@5.4.4)(db0@0.2.3(drizzle-orm@0.40.0(@cloudflare/workers-types@4.20250204.0)(@types/pg@8.11.11)(gel@2.0.0)(pg@8.13.3)(postgres@3.4.5)))(embla-carousel@8.5.2)(ioredis@5.5.0)(magicast@0.3.5)(radix-vue@1.9.13(vue@3.5.13(typescript@5.7.3)))(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
@@ -901,6 +904,10 @@ packages:
 
   '@floating-ui/vue@1.1.6':
     resolution: {integrity: sha512-XFlUzGHGv12zbgHNk5FN2mUB7ROul3oG2ENdTpWdE+qMFxyNxWSRmsoyhiEnpmabNm6WnUvR1OvJfUfN4ojC1A==}
+
+  '@google/generative-ai@0.23.0':
+    resolution: {integrity: sha512-8vGoguvLG22U3t9XpXvbxjxy/yfBhE27pqptz5QVKXwBSh9sUXXmZWS8ZdGMqifK7kiuZQCG2cjGJNUdBsgX+g==}
+    engines: {node: '>=18.0.0'}
 
   '@iconify-json/lucide@1.2.26':
     resolution: {integrity: sha512-arD/8mK0lRxFY2LgLf345NhWVWiOtV8sOxJuLnq4QRz3frMiOwVwGxEgp5Xe/bRGzxO2CxxCBok0bPRpCkYZQQ==}
@@ -5288,6 +5295,8 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@google/generative-ai@0.23.0': {}
 
   '@iconify-json/lucide@1.2.26':
     dependencies:
